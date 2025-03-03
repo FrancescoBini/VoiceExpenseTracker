@@ -13,9 +13,9 @@ interface AccountsTableProps {
 
 const defaultAccounts: Account[] = [
   { name: 'Cash', balance: 1250 },
-  { name: 'Conto ITA', balance: 15780 },
-  { name: 'Conto USA', balance: 8450 },
-  { name: 'Conto Nonna', balance: 2500 },
+  { name: 'ITA', balance: 15780 },
+  { name: 'USA', balance: 8450 },
+  { name: 'Nonna', balance: 2500 },
   { name: 'N26', balance: 3600 },
   { name: 'Revolut', balance: 3450 },
   { name: 'PayPal', balance: 780 },
@@ -57,6 +57,7 @@ export default function AccountsTable({ accounts = defaultAccounts }: AccountsTa
 
   return (
     <div className="bg-gray-800 rounded-lg p-4 shadow-lg">
+      <h2 className="text-lg font-medium text-center mb-4">Balances Table</h2>
       <table className="w-full">
         <tbody>
           {accountsState.map((account, index) => (
