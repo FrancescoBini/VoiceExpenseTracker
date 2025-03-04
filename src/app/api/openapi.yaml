@@ -1,0 +1,78 @@
+openapi: 3.0.0
+info:
+  title: Expense Tracker API
+  version: 1.0.0
+  description: API for managing expense and revenue transactions
+
+servers:
+  - url: https://4mar.vercel.app/api
+    description: Production server
+
+paths:
+  /transactions:
+    post:
+      summary: Add a new transaction
+      operationId: addTransaction
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Transaction'
+      responses:
+        '200':
+          description: Transaction successfully added
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  data:
+                    $ref: '#/components/schemas/Transaction'
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  error:
+                    type: string
+
+components:
+  schemas:
+    Transaction:
+      type: object
+      required:
+        - type
+        - amount
+        - category
+        - description
+        - payment_method
+      properties:
+        type:
+          type: string
+          enum: [expense, revenue]
+          description: Type of transaction
+        amount:
+          type: number
+          format: float
+          minimum: 0
+          description: Transaction amount
+        category:
+          type: string
+          enum: [Habits, House, Travels, Food, Investments, Transport, Other]
+          description: Transaction category
+        description:
+          type: string
+          description: Short description of the transaction
+        payment_method:
+          type: string
+          enum: [cash, ITA, USA, Nonna, N26, Revolut, PayPal]
+          description: Payment method used for the transaction 
