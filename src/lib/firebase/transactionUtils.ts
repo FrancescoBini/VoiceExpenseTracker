@@ -2,12 +2,14 @@ import { ref, get, set, update } from 'firebase/database';
 import { db } from './firebase';
 
 interface Transaction {
+  id: string;
   type: 'expense' | 'revenue';
   amount: number;
   category: 'Habits' | 'House' | 'Travels' | 'Food' | 'Investments' | 'Transport' | 'Other';
   description: string;
   payment_method: 'cash' | 'ITA' | 'USA' | 'Nonna' | 'N26' | 'Revolut' | 'PayPal';
   timestamp: number;
+  created_at: string;
 }
 
 interface MonthlyTotals {
