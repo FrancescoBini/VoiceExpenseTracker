@@ -1,11 +1,12 @@
 'use client';
 
 import { useState } from 'react';
-import { FaBars, FaHome, FaCocktail, FaPlane, FaCar, FaUtensils, FaChartLine, FaPlus } from 'react-icons/fa';
+import { FaHome, FaCocktail, FaPlane, FaCar, FaUtensils, FaChartLine, FaPlus } from 'react-icons/fa';
 import ExpenseWheel from './components/ExpenseWheel';
 import AccountsTable from './components/AccountsTable';
 import MonthSelector from './components/MonthSelector';
 import MonthlySumUp from './components/MonthlySumUp';
+import MenuButton from './components/MenuButton';
 import { useMonthlyData } from '@/lib/hooks/useMonthlyData';
 
 export default function Home() {
@@ -23,6 +24,13 @@ export default function Home() {
   if (!monthlyData) {
     return <div className="flex items-center justify-center min-h-screen bg-gray-900 text-white">No data available</div>;
   }
+
+  // Transform transactions from Record to Array
+  const transactionsArray = Object.entries(monthlyData.transactions || {}).map(([_, transaction]) => ({
+    ...transaction,
+    category: transaction.category as 'Habits' | 'House' | 'Travels' | 'Food' | 'Investments' | 'Transport' | 'Other',
+    payment_method: transaction.payment_method as 'cash' | 'ITA' | 'USA' | 'Nonna' | 'N26' | 'Revolut' | 'PayPal'
+  }));
 
   // Map Firebase data to the format expected by ExpenseWheel
   const categories = [
@@ -42,9 +50,7 @@ export default function Home() {
     <main className="min-h-screen bg-gray-900 text-white p-4">
       {/* Header */}
       <div className="flex justify-between items-center mb-8">
-        <button className="text-2xl hover:text-gray-300 transition-colors">
-          <FaBars />
-        </button>
+        <MenuButton transactions={transactionsArray} />
         <MonthSelector selectedMonth={selectedMonth} onMonthSelect={setSelectedMonth} />
         <div className="w-8" /> {/* Spacer for alignment */}
       </div>

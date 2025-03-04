@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { updateBalance } from '@/lib/firebase/transactionUtils';
 
 interface Balances {
   cash: number;
@@ -31,11 +32,16 @@ export default function AccountsTable({ balances }: AccountsTableProps) {
     setEditValue(value);
   };
 
-  const handleBalanceSubmit = (key: keyof Balances) => {
+  const handleBalanceSubmit = async (key: keyof Balances) => {
     const newBalance = parseFloat(editValue);
     if (!isNaN(newBalance)) {
-      // TODO: Add Firebase update logic here when needed
-      console.log('Update balance:', key, newBalance);
+      const result = await updateBalance(key, newBalance);
+      if (result.success) {
+        // The balance will be updated through the real-time listener
+        console.log('Balance updated successfully');
+      } else {
+        console.error('Failed to update balance:', result.error);
+      }
     }
     setEditingKey(null);
   };
