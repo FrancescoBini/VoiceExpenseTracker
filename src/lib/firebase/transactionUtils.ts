@@ -1,14 +1,19 @@
 import { ref, get, set, update } from 'firebase/database';
 import { db } from './firebase';
 
-interface Transaction {
-  id: string;
+// Base transaction type without id and created_at
+interface BaseTransaction {
   type: 'expense' | 'revenue';
   amount: number;
   category: 'Habits' | 'House' | 'Travels' | 'Food' | 'Investments' | 'Transport' | 'Other';
   description: string;
   payment_method: 'cash' | 'ITA' | 'USA' | 'Nonna' | 'N26' | 'Revolut' | 'PayPal';
   timestamp: number;
+}
+
+// Full transaction type with id and created_at
+interface Transaction extends BaseTransaction {
+  id: string;
   created_at: string;
 }
 
@@ -38,7 +43,7 @@ interface Balances {
   PayPal: number;
 }
 
-export async function addTransaction(transaction: Transaction) {
+export async function addTransaction(transaction: BaseTransaction) {
   console.log('Starting addTransaction with:', transaction);
   
   const now = new Date();
@@ -50,13 +55,16 @@ export async function addTransaction(transaction: Transaction) {
     const transactionId = `${transaction.timestamp}_${Math.random().toString(36).substr(2, 9)}`;
     console.log(`Adding transaction with ID: ${transactionId}`);
     
-    // 1. Add the transaction to the transactions list
-    const transactionRef = ref(db, `months/${year}/${month}/transactions/${transactionId}`);
-    await set(transactionRef, {
+    // Create the full transaction object
+    const fullTransaction: Transaction = {
       ...transaction,
       id: transactionId,
       created_at: now.toISOString()
-    });
+    };
+    
+    // 1. Add the transaction to the transactions list
+    const transactionRef = ref(db, `months/${year}/${month}/transactions/${transactionId}`);
+    await set(transactionRef, fullTransaction);
     console.log('Transaction saved successfully');
 
     // 2. Update monthly totals
