@@ -12,7 +12,7 @@ const defaultMonthlyData = {
   '2025-03': {
     categories: [
       { name: 'House', amount: 500, color: '#38BDF8', icon: FaHome },
-      { name: 'Habits', amount: 200, color: '#EF4444', icon: FaCocktail },
+      { name: 'Habits', amount: 200, color: '#FFD700', icon: FaCocktail },
       { name: 'Travels', amount: 300, color: '#3B82F6', icon: FaPlane },
       { name: 'Transport', amount: 150, color: '#F97316', icon: FaCar },
       { name: 'Food', amount: 400, color: '#a87bc7', icon: FaUtensils },
@@ -63,6 +63,7 @@ export default function Home() {
 
   // Load data from localStorage on initial render
   useEffect(() => {
+    localStorage.clear(); // Clear all stored data to force new defaults
     const savedData = localStorage.getItem('monthlyData');
     if (savedData) {
       try {
@@ -80,7 +81,7 @@ export default function Home() {
     return monthlyDataState[key as keyof typeof monthlyDataState] || {
       categories: [
         { name: 'House', amount: 0, color: '#38BDF8', icon: FaHome },
-        { name: 'Habits', amount: 0, color: '#EF4444', icon: FaCocktail },
+        { name: 'Habits', amount: 0, color: '#FFD700', icon: FaCocktail },
         { name: 'Travels', amount: 0, color: '#3B82F6', icon: FaPlane },
         { name: 'Transport', amount: 0, color: '#F97316', icon: FaCar },
         { name: 'Food', amount: 0, color: '#a87bc7', icon: FaUtensils },

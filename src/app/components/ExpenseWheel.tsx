@@ -21,7 +21,7 @@ interface ExpenseWheelProps {
 
 const defaultCategories: Category[] = [
   { name: 'Casa', amount: 500, color: '#38BDF8', icon: FaHome },
-  { name: 'Vizi', amount: 200, color: '#EF4444', icon: FaCocktail },
+  { name: 'Vizi', amount: 200, color: '#FFD700', icon: FaCocktail },
   { name: 'Viaggi', amount: 300, color: '#3B82F6', icon: FaPlane },
   { name: 'Mezzi', amount: 150, color: '#F97316', icon: FaCar },
   { name: 'Cibo', amount: 400, color: '#a87bc7', icon: FaUtensils },
