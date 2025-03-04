@@ -44,11 +44,17 @@ export async function addTransaction(transaction: Transaction) {
   const month = now.getMonth() + 1; // JavaScript months are 0-based
 
   try {
-    console.log(`Adding transaction to path: months/${year}/${month}/transactions/${transaction.timestamp}`);
+    // Create the transaction ID using timestamp and a random suffix for uniqueness
+    const transactionId = `${transaction.timestamp}_${Math.random().toString(36).substr(2, 9)}`;
+    console.log(`Adding transaction with ID: ${transactionId}`);
     
     // 1. Add the transaction to the transactions list
-    const transactionRef = ref(db, `months/${year}/${month}/transactions/${transaction.timestamp}`);
-    await set(transactionRef, transaction);
+    const transactionRef = ref(db, `months/${year}/${month}/transactions/${transactionId}`);
+    await set(transactionRef, {
+      ...transaction,
+      id: transactionId,
+      created_at: now.toISOString()
+    });
     console.log('Transaction saved successfully');
 
     // 2. Update monthly totals
@@ -59,7 +65,6 @@ export async function addTransaction(transaction: Transaction) {
       revenue: 0,
       net: 0
     };
-    console.log('Current monthly totals:', currentTotals);
 
     if (transaction.type === 'expense') {
       currentTotals.expenses += transaction.amount;
@@ -84,7 +89,6 @@ export async function addTransaction(transaction: Transaction) {
       Transport: 0,
       Other: 0
     };
-    console.log('Current category totals:', currentCategoryTotals);
 
     if (transaction.type === 'expense') {
       currentCategoryTotals[transaction.category] += transaction.amount;
@@ -105,7 +109,6 @@ export async function addTransaction(transaction: Transaction) {
       Revolut: 0,
       PayPal: 0
     };
-    console.log('Current balances:', currentBalances);
 
     // If it's an expense, decrease the balance; if revenue, increase it
     const amountChange = transaction.type === 'expense' ? -transaction.amount : transaction.amount;
@@ -114,7 +117,7 @@ export async function addTransaction(transaction: Transaction) {
     await set(balancesRef, currentBalances);
     console.log('Updated balances:', currentBalances);
 
-    return { success: true };
+    return { success: true, transactionId };
   } catch (error) {
     console.error('Error in addTransaction:', error);
     return { success: false, error: String(error) };
