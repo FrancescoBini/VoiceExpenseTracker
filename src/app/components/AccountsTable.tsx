@@ -2,56 +2,49 @@
 
 import { useState } from 'react';
 
-interface Account {
-  name: string;
-  balance: number;
+interface Balances {
+  cash: number;
+  ITA: number;
+  USA: number;
+  Nonna: number;
+  N26: number;
+  Revolut: number;
+  PayPal: number;
 }
 
 interface AccountsTableProps {
-  accounts?: Account[];
+  balances: Balances;
 }
 
-const defaultAccounts: Account[] = [
-  { name: 'Cash', balance: 1250 },
-  { name: 'ITA', balance: 15780 },
-  { name: 'USA', balance: 8450 },
-  { name: 'Nonna', balance: 2500 },
-  { name: 'N26', balance: 3600 },
-  { name: 'Revolut', balance: 3450 },
-  { name: 'PayPal', balance: 780 },
-];
-
-export default function AccountsTable({ accounts = defaultAccounts }: AccountsTableProps) {
-  const [editingIndex, setEditingIndex] = useState<number | null>(null);
-  const [accountsState, setAccountsState] = useState<Account[]>(accounts);
+export default function AccountsTable({ balances }: AccountsTableProps) {
+  const [editingKey, setEditingKey] = useState<keyof Balances | null>(null);
   const [editValue, setEditValue] = useState<string>('');
 
-  const handleBalanceClick = (index: number) => {
-    setEditingIndex(index);
-    setEditValue(accountsState[index].balance.toString());
+  const handleBalanceClick = (key: keyof Balances) => {
+    setEditingKey(key);
+    setEditValue(balances[key].toString());
   };
 
   const handleBalanceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    // Only allow whole numbers
-    const value = e.target.value.replace(/[^0-9]/g, '');
+    // Only allow numbers and decimal points
+    const value = e.target.value.replace(/[^0-9.]/g, '');
     setEditValue(value);
   };
 
-  const handleBalanceSubmit = (index: number) => {
-    const newBalance = parseInt(editValue);
+  const handleBalanceSubmit = (key: keyof Balances) => {
+    const newBalance = parseFloat(editValue);
     if (!isNaN(newBalance)) {
-      const newAccounts = [...accountsState];
-      newAccounts[index].balance = newBalance;
-      setAccountsState(newAccounts);
+      // TODO: Add Firebase update logic here when needed
+      console.log('Update balance:', key, newBalance);
     }
-    setEditingIndex(null);
+    setEditingKey(null);
   };
 
-  const handleKeyDown = (e: React.KeyboardEvent, index: number) => {
+  const handleKeyDown = (e: React.KeyboardEvent, key: keyof Balances) => {
     if (e.key === 'Enter') {
-      handleBalanceSubmit(index);
+      handleBalanceSubmit(key);
     } else if (e.key === 'Escape') {
-      setEditingIndex(null);
+      setEditingKey(null);
     }
   };
 
@@ -60,26 +53,26 @@ export default function AccountsTable({ accounts = defaultAccounts }: AccountsTa
       <h2 className="text-lg font-medium text-center mb-4">Balances Table</h2>
       <table className="w-full">
         <tbody>
-          {accountsState.map((account, index) => (
-            <tr key={account.name} className="border-b border-gray-700 last:border-0">
-              <td className="py-2 text-gray-300">{account.name}</td>
+          {(Object.entries(balances) as [keyof Balances, number][]).map(([key, balance]) => (
+            <tr key={key} className="border-b border-gray-700 last:border-0">
+              <td className="py-2 text-gray-300">{key.toUpperCase()}</td>
               <td className="py-2 text-right">
-                {editingIndex === index ? (
+                {editingKey === key ? (
                   <input
                     type="text"
                     value={editValue}
                     onChange={handleBalanceChange}
-                    onBlur={() => handleBalanceSubmit(index)}
-                    onKeyDown={(e) => handleKeyDown(e, index)}
+                    onBlur={() => handleBalanceSubmit(key)}
+                    onKeyDown={(e) => handleKeyDown(e, key)}
                     className="bg-gray-700 text-white px-2 py-1 rounded w-24 text-right"
                     autoFocus
                   />
                 ) : (
                   <button
-                    onClick={() => handleBalanceClick(index)}
+                    onClick={() => handleBalanceClick(key)}
                     className="text-gray-300 hover:text-white transition-colors focus:outline-none"
                   >
-                    {account.balance}€
+                    {balance}€
                   </button>
                 )}
               </td>
