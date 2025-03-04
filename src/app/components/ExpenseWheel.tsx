@@ -3,6 +3,8 @@
 import { useEffect, useRef, useState } from 'react';
 import { IconType } from 'react-icons';
 import { FaHome, FaCocktail, FaPlane, FaCar, FaUtensils, FaPlus, FaChartLine } from 'react-icons/fa';
+import { updateCategoryTotal, updateMonthlyTotal } from '@/lib/firebase/transactionUtils';
+import type { CategoryTotals } from '@/lib/firebase/transactionUtils';
 
 interface Category {
   name: string;
@@ -21,7 +23,7 @@ interface ExpenseWheelProps {
 
 const defaultCategories: Category[] = [
   { name: 'Casa', amount: 500, color: '#38BDF8', icon: FaHome },
-  { name: 'Vizi', amount: 200, color: '#EF4444', icon: FaCocktail },
+  { name: 'Vizi', amount: 200, color: '#FF0000', icon: FaCocktail },
   { name: 'Viaggi', amount: 300, color: '#3B82F6', icon: FaPlane },
   { name: 'Mezzi', amount: 150, color: '#F97316', icon: FaCar },
   { name: 'Cibo', amount: 400, color: '#a87bc7', icon: FaUtensils },
@@ -41,6 +43,16 @@ export default function ExpenseWheel({
   const [editValue, setEditValue] = useState<string>('');
   const [editingTotal, setEditingTotal] = useState<'expenses' | 'revenue' | null>(null);
   const [totalEditValue, setTotalEditValue] = useState<string>('');
+
+  const categoryNameMapping: Record<string, keyof CategoryTotals> = {
+    'Casa': 'House',
+    'Vizi': 'Habits',
+    'Viaggi': 'Travels',
+    'Mezzi': 'Transport',
+    'Cibo': 'Food',
+    'Altro': 'Other',
+    'Investimenti': 'Investments'
+  };
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -97,10 +109,22 @@ export default function ExpenseWheel({
     setEditValue(value);
   };
 
-  const handleAmountSubmit = (index: number) => {
+  const handleAmountSubmit = async (index: number) => {
     const newAmount = parseInt(editValue);
-    if (!isNaN(newAmount) && onCategoryUpdate) {
-      onCategoryUpdate(index, newAmount);
+    if (!isNaN(newAmount)) {
+      const categoryName = categories[index].name;
+      const mappedCategory = categoryNameMapping[categoryName];
+      if (mappedCategory) {
+        const result = await updateCategoryTotal(mappedCategory, newAmount);
+        if (result.success) {
+          if (onCategoryUpdate) {
+            onCategoryUpdate(index, newAmount);
+          }
+          console.log('Category amount updated successfully');
+        } else {
+          console.error('Failed to update category amount:', result.error);
+        }
+      }
     }
     setEditingIndex(null);
   };
@@ -125,10 +149,18 @@ export default function ExpenseWheel({
     setTotalEditValue(value);
   };
 
-  const handleTotalSubmit = () => {
+  const handleTotalSubmit = async () => {
     const newAmount = parseInt(totalEditValue);
-    if (!isNaN(newAmount) && onTotalUpdate && editingTotal) {
-      onTotalUpdate(editingTotal, newAmount);
+    if (!isNaN(newAmount) && editingTotal) {
+      const result = await updateMonthlyTotal(editingTotal, newAmount);
+      if (result.success) {
+        if (onTotalUpdate) {
+          onTotalUpdate(editingTotal, newAmount);
+        }
+        console.log('Total updated successfully');
+      } else {
+        console.error('Failed to update total:', result.error);
+      }
     }
     setEditingTotal(null);
   };
