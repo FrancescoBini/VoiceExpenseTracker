@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { addTransaction } from '@/lib/firebase/transactionUtils';
 
 // Type definitions matching our OpenAPI spec
 type Transaction = {
@@ -56,10 +57,13 @@ export async function OPTIONS(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
+    console.log('Received POST request to /api/transactions');
     const transaction: Transaction = await request.json();
+    console.log('Parsed transaction:', transaction);
 
     // Basic validation
     if (!transaction || !transaction.type || !transaction.amount || !transaction.category || !transaction.payment_method) {
+      console.log('Validation failed:', { transaction });
       return new NextResponse(JSON.stringify({
         success: false,
         error: 'Missing required fields'
@@ -74,12 +78,41 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    // For testing, we'll just echo back the received data
-    return new NextResponse(JSON.stringify({
+    // Add timestamp to the transaction
+    const transactionWithTimestamp = {
+      ...transaction,
+      timestamp: Date.now()
+    };
+    console.log('Adding timestamp:', transactionWithTimestamp);
+
+    // Store in Firebase and update totals
+    const result = await addTransaction(transactionWithTimestamp);
+    console.log('Firebase result:', result);
+
+    if (!result.success) {
+      console.error('Firebase error:', result.error);
+      return new NextResponse(JSON.stringify({
+        success: false,
+        error: result.error
+      }), {
+        status: 500,
+        headers: {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+          'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+        },
+      });
+    }
+
+    const response = {
       success: true,
-      message: 'Transaction received successfully',
-      data: transaction
-    }), {
+      message: 'Transaction stored successfully',
+      data: transactionWithTimestamp
+    };
+    console.log('Sending response:', response);
+
+    return new NextResponse(JSON.stringify(response), {
       status: 200,
       headers: {
         'Content-Type': 'application/json',
@@ -90,9 +123,10 @@ export async function POST(request: NextRequest) {
     });
 
   } catch (error) {
+    console.error('API error:', error);
     return new NextResponse(JSON.stringify({
       success: false,
-      error: 'Invalid request data'
+      error: String(error)
     }), {
       status: 400,
       headers: {
