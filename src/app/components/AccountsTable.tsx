@@ -36,11 +36,11 @@ export default function AccountsTable({ balances }: AccountsTableProps) {
     const newBalance = parseFloat(editValue);
     if (!isNaN(newBalance)) {
       const result = await updateBalance(key, newBalance);
-      if (result.success) {
+      if (result) {
         // The balance will be updated through the real-time listener
         console.log('Balance updated successfully');
       } else {
-        console.error('Failed to update balance:', result.error);
+        console.error('Failed to update balance');
       }
     }
     setEditingKey(null);
