@@ -7,7 +7,7 @@ interface BaseTransaction {
   amount: number;
   category: 'Habits' | 'House' | 'Travels' | 'Food' | 'Investments' | 'Transport' | 'Other';
   description: string;
-  payment_method: 'cash' | 'ITA' | 'USA' | 'Nonna' | 'N26' | 'Revolut' | 'PayPal';
+  payment_method: 'cash' | 'ita' | 'usa' | 'nonna' | 'n26' | 'revolut' | 'paypal';
   timestamp: number;
 }
 
@@ -35,12 +35,12 @@ export interface CategoryTotals {
 
 interface Balances {
   cash: number;
-  ITA: number;
-  USA: number;
-  Nonna: number;
-  N26: number;
-  Revolut: number;
-  PayPal: number;
+  ita: number;
+  usa: number;
+  nonna: number;
+  n26: number;
+  revolut: number;
+  paypal: number;
 }
 
 export async function addTransaction(transaction: BaseTransaction) {
@@ -112,17 +112,20 @@ export async function addTransaction(transaction: BaseTransaction) {
     const balancesSnapshot = await get(balancesRef);
     const currentBalances = balancesSnapshot.val() as Balances || {
       cash: 0,
-      ITA: 0,
-      USA: 0,
-      Nonna: 0,
-      N26: 0,
-      Revolut: 0,
-      PayPal: 0
+      ita: 0,
+      usa: 0,
+      nonna: 0,
+      n26: 0,
+      revolut: 0,
+      paypal: 0
     };
 
     // If it's an expense, decrease the balance; if revenue, increase it
     const amountChange = transaction.type === 'expense' ? -transaction.amount : transaction.amount;
-    currentBalances[transaction.payment_method.toLowerCase() as keyof Balances] += amountChange;
+    
+    // Ensure payment method is lowercase
+    const paymentMethod = transaction.payment_method.toLowerCase() as keyof Balances;
+    currentBalances[paymentMethod] += amountChange;
 
     await set(balancesRef, currentBalances);
     console.log('Updated balances:', currentBalances);
@@ -144,12 +147,12 @@ export async function updateBalance(key: keyof Balances, newBalance: number) {
     const balancesSnapshot = await get(balancesRef);
     const currentBalances = balancesSnapshot.val() as Balances || {
       cash: 0,
-      ITA: 0,
-      USA: 0,
-      Nonna: 0,
-      N26: 0,
-      Revolut: 0,
-      PayPal: 0
+      ita: 0,
+      usa: 0,
+      nonna: 0,
+      n26: 0,
+      revolut: 0,
+      paypal: 0
     };
 
     currentBalances[key] = newBalance;
@@ -275,17 +278,20 @@ export async function deleteTransaction(transaction: Transaction) {
     const balancesSnapshot = await get(balancesRef);
     const currentBalances = balancesSnapshot.val() as Balances || {
       cash: 0,
-      ITA: 0,
-      USA: 0,
-      Nonna: 0,
-      N26: 0,
-      Revolut: 0,
-      PayPal: 0
+      ita: 0,
+      usa: 0,
+      nonna: 0,
+      n26: 0,
+      revolut: 0,
+      paypal: 0
     };
 
     // If it was an expense, increase the balance; if revenue, decrease it
     const amountChange = transaction.type === 'expense' ? transaction.amount : -transaction.amount;
-    currentBalances[transaction.payment_method.toLowerCase() as keyof Balances] += amountChange;
+    
+    // Ensure payment method is lowercase
+    const paymentMethod = transaction.payment_method.toLowerCase() as keyof Balances;
+    currentBalances[paymentMethod] += amountChange;
 
     await set(balancesRef, currentBalances);
     console.log('Updated balances:', currentBalances);

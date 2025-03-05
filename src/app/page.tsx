@@ -9,6 +9,18 @@ import MonthlySumUp from './components/MonthlySumUp';
 import MenuButton from './components/MenuButton';
 import { useMonthlyData } from '@/lib/hooks/useMonthlyData';
 
+// Define Transaction type to match the one in other components
+interface Transaction {
+  id: string;
+  type: 'expense' | 'revenue';
+  amount: number;
+  category: 'Habits' | 'House' | 'Travels' | 'Food' | 'Investments' | 'Transport' | 'Other';
+  description: string;
+  payment_method: 'cash' | 'ita' | 'usa' | 'nonna' | 'n26' | 'revolut' | 'paypal';
+  timestamp: number;
+  created_at: string;
+}
+
 export default function Home() {
   const [selectedMonth, setSelectedMonth] = useState<Date>(new Date(2025, 2)); // March 2025
   const { monthlyData, loading, error } = useMonthlyData();
@@ -29,7 +41,7 @@ export default function Home() {
   const transactionsArray = Object.entries(monthlyData.transactions || {}).map(([_, transaction]) => ({
     ...transaction,
     category: transaction.category as 'Habits' | 'House' | 'Travels' | 'Food' | 'Investments' | 'Transport' | 'Other',
-    payment_method: transaction.payment_method as 'cash' | 'ITA' | 'USA' | 'Nonna' | 'N26' | 'Revolut' | 'PayPal'
+    payment_method: transaction.payment_method as 'cash' | 'ita' | 'usa' | 'nonna' | 'n26' | 'revolut' | 'paypal'
   }));
 
   // Map Firebase data to the format expected by ExpenseWheel

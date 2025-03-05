@@ -74,5 +74,5 @@ components:
           description: Short description of the transaction
         payment_method:
           type: string
-          enum: [cash, ITA, USA, Nonna, N26, Revolut, PayPal]
+          enum: [cash, ita, usa, nonna, n26, revolut, paypal]
           description: Payment method used for the transaction 

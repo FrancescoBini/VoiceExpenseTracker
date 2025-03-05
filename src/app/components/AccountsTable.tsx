@@ -5,12 +5,12 @@ import { updateBalance } from '@/lib/firebase/transactionUtils';
 
 interface Balances {
   cash: number;
-  ITA: number;
-  USA: number;
-  Nonna: number;
-  N26: number;
-  Revolut: number;
-  PayPal: number;
+  ita: number;
+  usa: number;
+  nonna: number;
+  n26: number;
+  revolut: number;
+  paypal: number;
 }
 
 interface AccountsTableProps {
@@ -61,7 +61,7 @@ export default function AccountsTable({ balances }: AccountsTableProps) {
         <tbody>
           {(Object.entries(balances) as [keyof Balances, number][]).map(([key, balance]) => (
             <tr key={key} className="border-b border-gray-700 last:border-0">
-              <td className="py-2 text-gray-300">{key.toUpperCase()}</td>
+              <td className="py-2 text-gray-300">{key}</td>
               <td className="py-2 text-right">
                 {editingKey === key ? (
                   <input

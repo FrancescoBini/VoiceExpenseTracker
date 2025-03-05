@@ -19,12 +19,12 @@ interface MonthlyData {
   };
   balances: {
     cash: number;
-    ITA: number;
-    USA: number;
-    Nonna: number;
-    N26: number;
-    Revolut: number;
-    PayPal: number;
+    ita: number;
+    usa: number;
+    nonna: number;
+    n26: number;
+    revolut: number;
+    paypal: number;
   };
   transactions: Record<string, {
     type: 'expense' | 'revenue';
@@ -75,12 +75,12 @@ export function useMonthlyData() {
             },
             balances: {
               cash: 0,
-              ITA: 0,
-              USA: 0,
-              Nonna: 0,
-              N26: 0,
-              Revolut: 0,
-              PayPal: 0
+              ita: 0,
+              usa: 0,
+              nonna: 0,
+              n26: 0,
+              revolut: 0,
+              paypal: 0
             },
             transactions: {}
           });
