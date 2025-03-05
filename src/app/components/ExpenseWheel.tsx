@@ -17,6 +17,7 @@ interface ExpenseWheelProps {
   categories: Category[];
   totalExpenses: number;
   totalIncome: number;
+  selectedMonth: Date;
   onCategoryUpdate?: (index: number, newAmount: number) => void;
   onTotalUpdate?: (type: 'expenses' | 'revenue', newAmount: number) => void;
 }
@@ -35,6 +36,7 @@ export default function ExpenseWheel({
   categories = defaultCategories,
   totalExpenses = 2650,
   totalIncome = 3000,
+  selectedMonth = new Date(),
   onCategoryUpdate,
   onTotalUpdate,
 }: Partial<ExpenseWheelProps>) {
@@ -44,6 +46,18 @@ export default function ExpenseWheel({
   const [editingTotal, setEditingTotal] = useState<'expenses' | 'revenue' | null>(null);
   const [totalEditValue, setTotalEditValue] = useState<string>('');
 
+  // Calculate the actual total expenses from categories
+  const calculatedTotalExpenses = categories.reduce((total, category) => {
+    // Skip the Investments category as it's not considered an expense
+    if (category.name !== 'Investments') {
+      return total + category.amount;
+    }
+    return total;
+  }, 0);
+
+  // Use the calculated total or the prop value
+  const displayTotalExpenses = calculatedTotalExpenses || totalExpenses;
+
   const categoryNameMapping: Record<string, keyof CategoryTotals> = {
     'Casa': 'House',
     'Vizi': 'Habits',
@@ -51,7 +65,14 @@ export default function ExpenseWheel({
     'Mezzi': 'Transport',
     'Cibo': 'Food',
     'Altro': 'Other',
-    'Investimenti': 'Investments'
+    'Investimenti': 'Investments',
+    'House': 'House',
+    'Habits': 'Habits',
+    'Travels': 'Travels',
+    'Transport': 'Transport',
+    'Food': 'Food',
+    'Other': 'Other',
+    'Investments': 'Investments'
   };
 
   useEffect(() => {
@@ -111,18 +132,27 @@ export default function ExpenseWheel({
 
   const handleAmountSubmit = async (index: number) => {
     const newAmount = parseInt(editValue);
+    console.log('handleAmountSubmit called with index:', index, 'newAmount:', newAmount);
+    
     if (!isNaN(newAmount)) {
       const categoryName = categories[index].name;
       const mappedCategory = categoryNameMapping[categoryName];
+      console.log('Category name:', categoryName, 'Mapped category:', mappedCategory);
+      
       if (mappedCategory) {
-        const result = await updateCategoryTotal(mappedCategory, newAmount);
-        if (result.success) {
+        const result = await updateCategoryTotal(mappedCategory, newAmount, selectedMonth);
+        console.log('updateCategoryTotal result:', result);
+        
+        if (result) {
           if (onCategoryUpdate) {
+            console.log('Calling onCategoryUpdate with index:', index, 'newAmount:', newAmount);
             onCategoryUpdate(index, newAmount);
+          } else {
+            console.log('onCategoryUpdate callback is not defined');
           }
           console.log('Category amount updated successfully');
         } else {
-          console.error('Failed to update category amount:', result.error);
+          console.error('Failed to update category amount');
         }
       }
     }
@@ -131,6 +161,7 @@ export default function ExpenseWheel({
 
   const handleKeyDown = (e: React.KeyboardEvent, index: number) => {
     if (e.key === 'Enter') {
+      e.preventDefault(); // Prevent form submission
       handleAmountSubmit(index);
     } else if (e.key === 'Escape') {
       setEditingIndex(null);
@@ -139,7 +170,7 @@ export default function ExpenseWheel({
 
   const handleTotalClick = (type: 'expenses' | 'revenue') => {
     setEditingTotal(type);
-    setTotalEditValue(type === 'expenses' ? totalExpenses.toString() : totalIncome.toString());
+    setTotalEditValue(type === 'expenses' ? displayTotalExpenses.toString() : totalIncome.toString());
     setEditingIndex(null); // Close any open category edit
   };
 
@@ -152,14 +183,14 @@ export default function ExpenseWheel({
   const handleTotalSubmit = async () => {
     const newAmount = parseInt(totalEditValue);
     if (!isNaN(newAmount) && editingTotal) {
-      const result = await updateMonthlyTotal(editingTotal, newAmount);
-      if (result.success) {
+      const result = await updateMonthlyTotal(editingTotal, newAmount, selectedMonth);
+      if (result) {
         if (onTotalUpdate) {
           onTotalUpdate(editingTotal, newAmount);
         }
         console.log('Total updated successfully');
       } else {
-        console.error('Failed to update total:', result.error);
+        console.error('Failed to update total');
       }
     }
     setEditingTotal(null);
@@ -196,7 +227,7 @@ export default function ExpenseWheel({
               onClick={() => handleTotalClick('expenses')}
               className="hover:text-red-400 transition-colors"
             >
-              {totalExpenses}€
+              {displayTotalExpenses}€
             </button>
           )}
         </div>
