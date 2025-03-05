@@ -17,9 +17,10 @@ interface Transaction {
 
 interface MenuButtonProps {
   transactions: Transaction[];
+  selectedMonth: Date;
 }
 
-export default function MenuButton({ transactions }: MenuButtonProps) {
+export default function MenuButton({ transactions, selectedMonth }: MenuButtonProps) {
   const [isCurtainOpen, setIsCurtainOpen] = useState(false);
 
   return (
@@ -35,6 +36,7 @@ export default function MenuButton({ transactions }: MenuButtonProps) {
         isOpen={isCurtainOpen}
         onClose={() => setIsCurtainOpen(false)}
         transactions={transactions}
+        selectedMonth={selectedMonth}
       />
     </>
   );
