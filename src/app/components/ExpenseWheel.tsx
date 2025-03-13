@@ -82,13 +82,13 @@ export default function ExpenseWheel({
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    // Set canvas size
-    canvas.width = 400;
-    canvas.height = 400;
+    // Set canvas size - reduced by 15%
+    canvas.width = 340; // 400 * 0.85 = 340
+    canvas.height = 340; // 400 * 0.85 = 340
     const centerX = canvas.width / 2;
     const centerY = canvas.height / 2;
     const outerRadius = Math.min(centerX, centerY) - 10;
-    const innerRadius = outerRadius - 30; // Make the ring 30px thick
+    const innerRadius = outerRadius - 25; // Adjusted thickness proportionally
 
     // Clear canvas
     ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -205,12 +205,12 @@ export default function ExpenseWheel({
   };
 
   return (
-    <div className="relative w-full max-w-2xl mx-auto">
+    <div className="relative w-full max-w-xl mx-auto">
       <canvas ref={canvasRef} className="w-full h-full" />
       
       {/* Center text */}
       <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center">
-        <div className="text-red-500 text-lg font-medium">
+        <div className="text-red-500 text-base font-medium">
           Expenses:{' '}
           {editingTotal === 'expenses' ? (
             <input
@@ -219,7 +219,7 @@ export default function ExpenseWheel({
               onChange={handleTotalChange}
               onBlur={handleTotalSubmit}
               onKeyDown={handleTotalKeyDown}
-              className="bg-gray-700 text-white px-2 py-1 rounded w-24 text-right"
+              className="bg-gray-700 text-white px-2 py-1 rounded w-20 text-right"
               autoFocus
             />
           ) : (
@@ -231,7 +231,7 @@ export default function ExpenseWheel({
             </button>
           )}
         </div>
-        <div className="text-green-500 text-lg font-medium">
+        <div className="text-green-500 text-base font-medium">
           Revenue:{' '}
           {editingTotal === 'revenue' ? (
             <input
@@ -240,7 +240,7 @@ export default function ExpenseWheel({
               onChange={handleTotalChange}
               onBlur={handleTotalSubmit}
               onKeyDown={handleTotalKeyDown}
-              className="bg-gray-700 text-white px-2 py-1 rounded w-24 text-right"
+              className="bg-gray-700 text-white px-2 py-1 rounded w-20 text-right"
               autoFocus
             />
           ) : (
@@ -257,7 +257,7 @@ export default function ExpenseWheel({
       {/* Category icons and amounts */}
       {categories.map((category, index) => {
         const angle = (index * 2 * Math.PI) / categories.length - Math.PI / 2;
-        const radius = 200;
+        const radius = 170; // 200 * 0.85 = 170
         const x = Math.cos(angle) * radius;
         const y = Math.sin(angle) * radius;
 
@@ -271,8 +271,8 @@ export default function ExpenseWheel({
             }}
           >
             <div className="flex flex-col items-center bg-gray-800 rounded-lg p-2 shadow-lg">
-              {<category.icon className="text-2xl mb-1" style={{ color: category.color }} />}
-              <div className="text-sm font-medium">{category.name}</div>
+              {<category.icon className="text-xl mb-1" style={{ color: category.color }} />}
+              <div className="text-xs font-medium">{category.name}</div>
               {editingIndex === index ? (
                 <input
                   type="text"
@@ -280,13 +280,13 @@ export default function ExpenseWheel({
                   onChange={handleAmountChange}
                   onBlur={() => handleAmountSubmit(index)}
                   onKeyDown={(e) => handleKeyDown(e, index)}
-                  className="bg-gray-700 text-white px-2 py-1 rounded w-20 text-right"
+                  className="bg-gray-700 text-white px-2 py-1 rounded w-16 text-right"
                   autoFocus
                 />
               ) : (
                 <button
                   onClick={() => handleAmountClick(index)}
-                  className="text-sm hover:text-gray-300 transition-colors"
+                  className="text-xs hover:text-gray-300 transition-colors"
                 >
                   {category.amount}€
                 </button>

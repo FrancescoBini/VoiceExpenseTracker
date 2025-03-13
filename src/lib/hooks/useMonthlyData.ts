@@ -26,6 +26,7 @@ interface MonthlyData {
     revolut: number;
     paypal: number;
   };
+  netWorth?: Record<string, number>;
   transactions: Record<string, {
     type: 'expense' | 'revenue';
     amount: number;
@@ -63,6 +64,7 @@ const defaultMonthlyData: MonthlyData = {
     revolut: 0,
     paypal: 0
   },
+  netWorth: {},
   transactions: {}
 };
 
@@ -108,6 +110,7 @@ export function useMonthlyData(selectedMonth: Date = new Date()) {
               revolut: data.balances?.revolut || 0,
               paypal: data.balances?.paypal || 0
             },
+            netWorth: data.netWorth || {},
             transactions: data.transactions || {}
           };
           setMonthlyData(completeData);

@@ -234,6 +234,7 @@ export default function Home() {
             revolut: 0,
             paypal: 0
           }}
+          data={monthlyData.netWorth || {}}
         />
       </div>
     </main>
