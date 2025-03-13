@@ -7,6 +7,7 @@ import AccountsTable from './components/AccountsTable';
 import MonthSelector from './components/MonthSelector';
 import MonthlySumUp from './components/MonthlySumUp';
 import TransactionsCurtain from './components/TransactionsCurtain';
+import NetWorthTable from './components/NetWorthTable';
 import { useMonthlyData } from '@/lib/hooks/useMonthlyData';
 
 // Define Transaction type to match the one in other components
@@ -219,6 +220,21 @@ export default function Home() {
             investmentAmount={investmentAmount}
           />
         </div>
+      </div>
+
+      {/* Bottom left - Net Worth Table */}
+      <div className="fixed bottom-4 left-4 w-64">
+        <NetWorthTable 
+          balances={monthlyData.balances || {
+            cash: 0,
+            ita: 0,
+            usa: 0,
+            nonna: 0,
+            n26: 0,
+            revolut: 0,
+            paypal: 0
+          }}
+        />
       </div>
     </main>
   );
