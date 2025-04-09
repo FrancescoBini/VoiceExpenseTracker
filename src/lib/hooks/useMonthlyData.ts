@@ -26,6 +26,23 @@ interface MonthlyData {
     revolut: number;
     paypal: number;
   };
+  networth: {
+    cash: number;
+    ita: number;
+    usa: number;
+    nonna: number;
+    n26: number;
+    revolut: number;
+    paypal: number;
+    binance: number;
+    metamask: number;
+    near: number;
+    coinbase: number;
+    venmo: number;
+    robinhood: number;
+    'solana+kresus': number;
+    'terreno indo': number;
+  };
   transactions: Record<string, {
     type: 'expense' | 'revenue';
     amount: number;
@@ -62,6 +79,23 @@ const defaultMonthlyData: MonthlyData = {
     n26: 0,
     revolut: 0,
     paypal: 0
+  },
+  networth: {
+    cash: 0,
+    ita: 0,
+    usa: 0,
+    nonna: 0,
+    n26: 0,
+    revolut: 0,
+    paypal: 0,
+    binance: 0,
+    metamask: 0,
+    near: 0,
+    coinbase: 0,
+    venmo: 0,
+    robinhood: 0,
+    'solana+kresus': 0,
+    'terreno indo': 0
   },
   transactions: {}
 };
@@ -107,6 +141,23 @@ export function useMonthlyData(selectedMonth: Date = new Date()) {
               n26: data.balances?.n26 || 0,
               revolut: data.balances?.revolut || 0,
               paypal: data.balances?.paypal || 0
+            },
+            networth: {
+              cash: data.networth?.cash || 0,
+              ita: data.networth?.ita || 0,
+              usa: data.networth?.usa || 0,
+              nonna: data.networth?.nonna || 0,
+              n26: data.networth?.n26 || 0,
+              revolut: data.networth?.revolut || 0,
+              paypal: data.networth?.paypal || 0,
+              binance: data.networth?.binance || 0,
+              metamask: data.networth?.metamask || 0,
+              near: data.networth?.near || 0,
+              coinbase: data.networth?.coinbase || 0,
+              venmo: data.networth?.venmo || 0,
+              robinhood: data.networth?.robinhood || 0,
+              'solana+kresus': data.networth?.['solana+kresus'] || 0,
+              'terreno indo': data.networth?.['terreno indo'] || 0
             },
             transactions: data.transactions || {}
           };

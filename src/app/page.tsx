@@ -8,6 +8,7 @@ import MonthSelector from './components/MonthSelector';
 import MonthlySumUp from './components/MonthlySumUp';
 import TransactionsCurtain from './components/TransactionsCurtain';
 import { useMonthlyData } from '@/lib/hooks/useMonthlyData';
+import NetWorthTable from './components/NetWorthTable';
 
 // Define Transaction type to match the one in other components
 interface Transaction {
@@ -104,8 +105,25 @@ export default function Home() {
 
       {/* Main content */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-        {/* Expense Wheel - Centered */}
-        <div className="lg:col-span-8 lg:col-start-3 flex justify-center">
+        {/* Left column with net worth table */}
+        <div className="lg:col-span-3">
+          <NetWorthTable 
+            balances={monthlyData.balances || {
+              cash: 0,
+              ita: 0,
+              usa: 0,
+              nonna: 0,
+              n26: 0,
+              revolut: 0,
+              paypal: 0
+            }} 
+            networth={monthlyData.networth}
+            selectedMonth={selectedMonth} 
+          />
+        </div>
+
+        {/* Center column with expense wheel */}
+        <div className="lg:col-span-6 flex justify-center">
           <ExpenseWheel 
             categories={categories}
             totalExpenses={calculatedTotalExpenses}
@@ -203,7 +221,7 @@ export default function Home() {
         </div>
 
         {/* Right column with tables */}
-        <div className="lg:col-span-2 space-y-8">
+        <div className="lg:col-span-3 space-y-8">
           <AccountsTable balances={monthlyData.balances || {
             cash: 0,
             ita: 0,
@@ -212,7 +230,7 @@ export default function Home() {
             n26: 0,
             revolut: 0,
             paypal: 0
-          }} />
+          }} selectedMonth={selectedMonth} />
           <MonthlySumUp
             totalExpenses={calculatedTotalExpenses}
             totalRevenue={monthlyData.totals?.revenue || 0}
