@@ -107,15 +107,19 @@ export default function Home() {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
         {/* Left column with net worth table */}
         <div className="lg:col-span-3">
-          <NetWorthTable balances={monthlyData.balances || {
-            cash: 0,
-            ita: 0,
-            usa: 0,
-            nonna: 0,
-            n26: 0,
-            revolut: 0,
-            paypal: 0
-          }} />
+          <NetWorthTable 
+            balances={monthlyData.balances || {
+              cash: 0,
+              ita: 0,
+              usa: 0,
+              nonna: 0,
+              n26: 0,
+              revolut: 0,
+              paypal: 0
+            }} 
+            networth={monthlyData.networth}
+            selectedMonth={selectedMonth} 
+          />
         </div>
 
         {/* Center column with expense wheel */}

@@ -43,6 +43,24 @@ interface Balances {
   paypal: number;
 }
 
+interface NetWorthBalances {
+  cash: number;
+  ita: number;
+  usa: number;
+  nonna: number;
+  n26: number;
+  revolut: number;
+  paypal: number;
+  binance: number;
+  metamask: number;
+  near: number;
+  coinbase: number;
+  venmo: number;
+  robinhood: number;
+  'solana+kresus': number;
+  'terreno indo': number;
+}
+
 export async function addTransaction(transaction: BaseTransaction, selectedMonth: Date = new Date()) {
   console.log('Starting addTransaction with:', transaction);
   
@@ -357,6 +375,55 @@ export async function deleteTransaction(transaction: Transaction, selectedMonth:
     return true;
   } catch (error) {
     console.error('Error in deleteTransaction:', error);
+    return false;
+  }
+}
+
+export async function updateNetWorth(key: keyof NetWorthBalances, newValue: number, selectedMonth: Date = new Date()) {
+  console.log(`Updating net worth for ${key} to ${newValue}`);
+  
+  const year = selectedMonth.getFullYear();
+  const month = selectedMonth.getMonth() + 1; // JavaScript months are 0-based
+  
+  try {
+    const netWorthRef = ref(db, `months/${year}/${month}/networth/${key}`);
+    await set(netWorthRef, newValue);
+    console.log(`Net worth for ${key} updated successfully`);
+    return true;
+  } catch (error) {
+    console.error(`Error updating net worth for ${key}:`, error);
+    return false;
+  }
+}
+
+export async function copyBalancesToNextMonth(selectedMonth: Date) {
+  const currentYear = selectedMonth.getFullYear();
+  const currentMonth = selectedMonth.getMonth() + 1; // JavaScript months are 0-based
+  
+  // Calculate next month and year
+  const nextMonth = currentMonth === 12 ? 1 : currentMonth + 1;
+  const nextYear = currentMonth === 12 ? currentYear + 1 : currentYear;
+  
+  try {
+    // Get current month's balances
+    const currentBalancesRef = ref(db, `months/${currentYear}/${currentMonth}/balances`);
+    const currentBalancesSnapshot = await get(currentBalancesRef);
+    
+    if (!currentBalancesSnapshot.exists()) {
+      console.error('No balances found for current month');
+      return false;
+    }
+    
+    const currentBalances = currentBalancesSnapshot.val() as Balances;
+    
+    // Set the balances for next month
+    const nextMonthBalancesRef = ref(db, `months/${nextYear}/${nextMonth}/balances`);
+    await set(nextMonthBalancesRef, currentBalances);
+    
+    console.log(`Successfully copied balances from ${currentYear}/${currentMonth} to ${nextYear}/${nextMonth}`);
+    return true;
+  } catch (error) {
+    console.error('Error copying balances to next month:', error);
     return false;
   }
 } 
